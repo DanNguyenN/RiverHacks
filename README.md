@@ -32,7 +32,7 @@ Using Azure Services in order to make application fully working
 
 So far we have a working backend and front end, but it is not connected togheter. We hope to fully integrate it to serve ACC Riverbats
 
-#TO USE THE PROJECT
+# TO USE THE PROJECT
 You have to create a file call config.py and replace key and endpoint. API used are Respell, Azure, and OpenAI
 ```
 RespellAPI = 'key'
