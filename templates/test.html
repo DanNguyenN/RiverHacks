@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Bot</title>
+    <style>
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .message {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .user-message {
+            color: blue;
+        }
+        .bot-message {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Chat Bot</h1>
+        <div id="conversation">
+            <p class="bot-message">Bot: Welcome! How can I assist you today?</p>
+        </div>
+        <button id="record-button">Record</button>
+    </div>
+
+    <script>
+        var recordButton = document.getElementById('record-button');
+        var conversationElement = document.getElementById('conversation');
+
+        recordButton.addEventListener('click', function() {
+            recordButton.disabled = true;
+            recordButton.textContent = 'Recording...';
+
+            // Call the Flask endpoint to start recording
+            fetch('/start-recording', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    conversationElement.innerHTML += '<p class="user-message">You: ' + data.userInput + '</p>';
+                    recordButton.disabled = false;
+                    recordButton.textContent = 'Record';
+
+                    // Call the Flask endpoint to generate bot response
+                    fetch('/generate-response', {
+                        method: 'POST',
+                        body: JSON.stringify({ user_input: data.userInput }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            conversationElement.innerHTML += '<p class="bot-message">Bot: ' + data.botResponse + '</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error:', error);
+                    });
+                }
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                recordButton.disabled = false;
+                recordButton.textContent = 'Record';
+            });
+        });
+    </script>
+</body>
+</html>
