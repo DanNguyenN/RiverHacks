@@ -36,7 +36,7 @@
         recordButton.addEventListener('click', function() {
             recordButton.disabled = true;
             recordButton.textContent = 'Recording...';
-
+            var text;
             // Call the Flask endpoint to start recording
             fetch('/start-recording', {
                 method: 'POST'
@@ -44,34 +44,32 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    text = data.userInput;
                     conversationElement.innerHTML += '<p class="user-message">You: ' + data.userInput + '</p>';
-                    recordButton.disabled = false;
-                    recordButton.textContent = 'Record';
 
-                    // Call the Flask endpoint to generate bot response
-                    fetch('/generate-response', {
-                        method: 'POST',
-                        body: JSON.stringify({ user_input: data.userInput }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            conversationElement.innerHTML += '<p class="bot-message">Bot: ' + data.botResponse + '</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.log('Error:', error);
-                    });
                 }
             })
-            .catch(error => {
-                console.log('Error:', error);
-                recordButton.disabled = false;
-                recordButton.textContent = 'Record';
+            .then(() => {
+                recordButton.textContent = 'Waiting for bot response...';
+                //Call the flask endpoint to process the text
+                fetch('/process-text', {
+                    method: 'POST',
+                    body: JSON.stringify({ user_input: text}),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        conversationElement.innerHTML += '<p class="bot-message">Bot: ' + data.userInput + '</p>';
+                        recordButton.disabled = false;
+                        recordButton.textContent = 'Record';
+                    }
+                })
             });
+
+
+
         });
     </script>
 </body>
