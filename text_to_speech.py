@@ -20,6 +20,5 @@ def text_to_speech(text):
         </speak>"""
 
     ## Calling the Speech Sythesizer
-    result = speech_synthesizer.speak_ssml_async(ssml=ssml_text).get()
-    return result
-#text_to_speech("How are you doing my friends")
+    speech_synthesizer.speak_ssml_async(ssml=ssml_text).get()
+
